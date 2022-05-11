@@ -1,0 +1,15 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+
+div.video {
+  z-index:-1;
+}
+
+div.canvas {
+  z-index:3;
+}
