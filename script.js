@@ -32,7 +32,7 @@ function setup() {
     for (let i = 0; i < onomatope.length; i++) {
       posx.push(Math.random() * width);
       posy.push(height * 0.1 + Math.random() * height * 0.7);
-      speed.push(Math.random() * 8 + 2);
+      speed.push(Math.random() * 4 + 2);
     }
 
     player.loadVideoById({
@@ -43,7 +43,7 @@ function setup() {
     player_tag.position(0, 0);
   });
 
-  canvas = createCanvas(windowWidth, windowWidth * 0.55);
+  canvas = createCanvas(windowWidth, windowWidth * 0.5);
   canvas.parent('canvas');
   textSize(windowWidth * 0.04);
 
@@ -56,7 +56,7 @@ function draw() {
       text(onomatope[i], posx[i], posy[i]);
     } else {
       posx[i] = width + 200 * Math.random();
-      speed[i] = Math.random() * 8 + 2;
+      speed[i] = Math.random() * 4 + 2;
     }
     posx[i] -= speed[i];
   }
