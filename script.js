@@ -5,20 +5,13 @@ let size = [];
 let speed = [];
 let vid;
 let canvas;
-let player;
+let player_tag;
 let docid;
+let player;
+
 
 function setup() {
 
-  var url = new URL(window.location.href);
-  var params = url.searchParams;
-  // var docid = params.get('mode');
-  if(params.has('docid')){
-    docid = params.get('docid');    
-  }else{
-    docid = 'otter001';
-  }
-  
   const firebaseConfig = {
     apiKey: "AIzaSyBiaSA2Arc_xsuIC_wu-C4yIYAMl7Pa9v4",
     authDomain: "onozoo-e2881.firebaseapp.com",
@@ -28,42 +21,81 @@ function setup() {
     appId: "1:405504156987:web:6e1ff59440c21f1f85831e",
     measurementId: "G-2NNGTWJC9L"
   };
-  
+
   // Initialize Firebase
   const app = firebase.initializeApp(firebaseConfig);
   var db = firebase.firestore();
-  player = select("#yt_video");      
+  player_tag = select("#player");
   db.collection("animals").doc(docid).get().then((doc) => {
-        data = doc.data(); 
-        onomatope = data.onomatopoeia;
-        for(let i=0;i<onomatope.length;i++){
-          posx.push(Math.random()*width);
-          posy.push(height*0.1+Math.random()*height*0.7);
-          speed.push(Math.random()*8+2);
-        }      
+    data = doc.data();
+    onomatope = data.onomatopoeia;
+    for (let i = 0; i < onomatope.length; i++) {
+      posx.push(Math.random() * width);
+      posy.push(height * 0.1 + Math.random() * height * 0.7);
+      speed.push(Math.random() * 8 + 2);
+    }
 
-        player.attribute('src', `https://www.youtube.com/embed/${data.youtubeid}?loop=1&autoplay=1&mute=1&wmode=transparent&playlist=${data.youtubeid}`);
-        player.attribute('width', windowWidth);
-        player.attribute('height',windowWidth*0.6);
-        player.position(0,0);      
+    player.loadVideoById({
+      'videoId': data.youtubeid
     });
-    canvas = createCanvas(windowWidth, windowWidth*0.5);
-    canvas.parent('canvas');
-    textSize(windowWidth*0.04);    
+    player_tag.attribute('width', windowWidth);
+    player_tag.attribute('height', windowWidth * 0.6);
+    player_tag.position(0, 0);
+  });
+
+  canvas = createCanvas(windowWidth, windowWidth * 0.55);
+  canvas.parent('canvas');
+  textSize(windowWidth * 0.04);
 
 }
 
 function draw() {
   clear();
-  for(let i=0;i<onomatope.length;i++){
-    if(posx[i]>-200){
-      text(onomatope[i],posx[i],posy[i]);
-    }else{
-      posx[i] = width+200*Math.random();
-      speed[i] = Math.random()*8+2;
+  for (let i = 0; i < onomatope.length; i++) {
+    if (posx[i] > -200) {
+      text(onomatope[i], posx[i], posy[i]);
+    } else {
+      posx[i] = width + 200 * Math.random();
+      speed[i] = Math.random() * 8 + 2;
     }
     posx[i] -= speed[i];
   }
-  canvas.style('z-index','3');
-  player.style('z-index','-1');
+  canvas.style('z-index', '3');
+  player_tag.style('z-index', '-1');
+}
+
+
+var url = new URL(window.location.href);
+var params = url.searchParams;
+if (params.has('docid')) {
+  docid = params.get('docid');
+} else {
+  docid = 'otter001';
+}
+
+//IFrame Player APIの読み込み
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+//YouTube playerの埋め込み
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    width: window.innerWidth, //プレーヤーの幅
+    height: window.innerWidth * 0.6, //プレーヤーの高さ
+    videoId: "-B-9dkIPP6s", //YouTubeのID
+    events: {
+      'onReady': onPlayerReady
+    },
+    playerVars: {
+      autoplay: 1
+    },
+  });
+}
+
+
+function onPlayerReady(event) {
+  event.target.mute();
+  event.target.playVideo();
 }
